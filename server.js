@@ -1,6 +1,5 @@
 // open another terminal and execute "npm run devStart" at the directory containing server.js
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const mysql = require("mysql");
@@ -16,14 +15,26 @@ const db = mysql.createPool({
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended:true}));
 
 // Get all courses at explore page
 app.get('/course/all', (req, res) => {
     db.query("SELECT * FROM course;", (err,result)=>{
         if(err){
             console.log(err);
-            res.status(500).send("some internal error occurred");
+            res.status(500).send("get all courses error occurred");
+        }
+        else{
+            res.status(200).send(result);
+        }    
+    });
+});
+
+// Get course details by id
+app.get('/course/by-cid', (req, res) => {
+    db.query(`SELECT * FROM course where id = '${req.query.cid}'`, (err,result)=>{
+        if(err){
+            console.log(err);
+            res.status(500).send("cid error occurred");
         }
         else{
             res.status(200).send(result);
@@ -71,14 +82,11 @@ app.post("/user/add", (req, res) => {
 });
 
 // Add transaction after user register for the course
-app.post("/transaction/add", (req, res) => {
-    const user= req.body.user;
-    const course= req.body.course;
-
+app.post("/transaction/add/by-uid-cid", (req, res) => {
     const sqlInsert = 
-        "insert into transaction (signup,user,course) values (now(),?,?)";
+        `insert into transaction (signup,user,course) values (now(),'${req.query.uid}','${req.query.cid}')`;
   
-    db.query(sqlInsert, [user,course],
+    db.query(sqlInsert,
         (errors, results) => {
             if (errors) {
                 console.log(errors);
@@ -90,7 +98,7 @@ app.post("/transaction/add", (req, res) => {
     );
 });
 
-// Get transaction completion status
+// Get transaction completion status by user id and course id
 app.get("/transaction/by-uid-cid", (req, res) => {
   db.query(
     `select completed from transaction where user = '${req.query.uid}' and course = '${req.query.cid}'`,
@@ -105,18 +113,33 @@ app.get("/transaction/by-uid-cid", (req, res) => {
   );
 });
 
-// Update transaction completion timestamp after passing quiz
-app.post("/transaction/update", (req, res) => {
-    const user= req.body.user;
-    const course= req.body.course;
-    const sqlUpdate = 
-        "update transaction set completed = now() where user = ? and course = ?";
+// Get completed courses by user id
+app.get("/transaction/completed/by-uid", (req, res) => {
+  db.query(
+    `select course 
+    from transaction 
+    where user = '${req.query.uid}' AND completed != '0000-00-00 00:00:00'`,
+    (errors, results) => {
+      if (errors) {
+        console.log(errors);
+        res.status(500).send("Error occurred for get completed courses");
+      } else {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
 
-    db.query(sqlUpdate, [user,course],
+// Update transaction completion timestamp by user id and course id after completing quiz
+app.put("/transaction/update/by-uid-cid", (req, res) => {
+    const sqlUpdate = 
+        `update transaction set completed = now() where user = '${req.query.uid}' and course = '${req.query.cid}'`;
+
+    db.query(sqlUpdate,
         (errors, results) => {
             if (errors) {
                 console.log(errors);
-                res.status(500).send("Some internal error occurred");
+                res.status(500).send("Error occurred for updating transaction completion timestamp");
             } else {
                 res.status(200).send("Successfully updated transaction completion");
             }
@@ -124,18 +147,20 @@ app.post("/transaction/update", (req, res) => {
     );
 });
 
-// Add earnings to user's wallet after passing quiz
-app.post("/user/wallet/update", (req, res) => {
-    const earnings= req.body.earnings;
-    const id= req.body.id;
+// Add earnings to user's wallet by user id and course id after completing quiz
+app.put("/user/wallet/update/by-uid-cid", (req, res) => {
     const sqlUpdate = 
-        "update user set wallet = wallet + ? where id = ?";
+        `update user as u
+        inner join transaction as t ON u.id = t.user
+        inner join course as c ON t.course = c.id
+        set u.wallet = u.wallet + c.earnings
+        where u.id = '${req.query.uid}' and c.id = '${req.query.cid}'`;
 
-    db.query(sqlUpdate, [earnings,id],
+    db.query(sqlUpdate,
         (errors, results) => {
             if (errors) {
                 console.log(errors);
-                res.status(500).send("Some internal error occurred");
+                res.status(500).send("Error occurred for adding earnings to wallet");
             } else {
                 res.status(200).send("Successfully updated user wallet");
             }
