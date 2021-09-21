@@ -35,25 +35,15 @@ connection.connect((errors) => {
         `create table course(
             id VARCHAR(14) NOT NULL,
             title VARCHAR(100) NOT NULL,
-            category VARCHAR(50) NOT NULL,
-            description VARCHAR(1000) NOT NULL,
-            objective VARCHAR(2000) NOT NULL,
-            duration FLOAT NOT NULL,
-            provider VARCHAR(50) NOT NULL,
-            provider_info VARCHAR(800) NOT NULL,
+            category VARCHAR(50),
+            description VARCHAR(1000),
+            objective VARCHAR(2000),
+            duration FLOAT,
+            provider VARCHAR(50),
+            provider_info VARCHAR(800),
             earnings INT NOT NULL,
             image_link VARCHAR(200),
             video_link VARCHAR(200),
-            quiz_q1 VARCHAR(200),
-            quiz_a1 BOOLEAN,
-            quiz_q2 VARCHAR(200),
-            quiz_a2 BOOLEAN,
-            quiz_q3 VARCHAR(200),
-            quiz_a3 BOOLEAN,
-            quiz_q4 VARCHAR(200),
-            quiz_a4 BOOLEAN,
-            quiz_q5 VARCHAR(200),
-            quiz_a5 BOOLEAN,
             PRIMARY KEY (id)
         )`, 
         (errors, results) => {
@@ -76,7 +66,6 @@ connection.connect((errors) => {
     request(options, function (error, response) {
     if (error) throw new Error(error);
     const obj = JSON.parse(response.body);
-    //   console.log(obj.data.courses[0].areaOfTrainings[0].description);
 
     connection.query(
         `insert into course 
@@ -96,34 +85,63 @@ connection.connect((errors) => {
             }
         );
 
-        if(obj.data.courses[0].referenceNumber == 'TGS-2020507496')
-        {
-            connection.query(
-                `UPDATE
-                course
-                SET
-                image_link = 'https://images.unsplash.com/photo-1519995451813-39e29e054914?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-                video_link = 'https://www.youtube.com/watch?v=SSo_EIwHSd4',
-                quiz_q1 = 'Blockchain is the same as bitcoin.',
-                quiz_a1 = false,
-                quiz_q2 = 'Multiple people can access a record simultaneously when it is on a blockchain.',
-                quiz_a2 = true,
-                quiz_q3 = 'Records cannot be altered once they are submitted on a blockchain.',
-                quiz_a3 = true,
-                quiz_q4 = 'It is possible to program a blockchain to record transactions automatically.',
-                quiz_a4 = true,
-                quiz_q5 = 'All blockchains are fully public.',
-                quiz_a5 = false
-                WHERE
-                id = 'TGS-2020507496'`,
-                (errors, results) => {
-                        if (errors) throw errors;
-                    }
-            );
-        }
-        console.log(`Inserted course ${obj.data.courses[0].referenceNumber}: ${obj.data.courses[0].title}`);
+    if(obj.data.courses[0].referenceNumber == 'TGS-2020507496')
+    {
+        connection.query(
+            `UPDATE
+            course
+            SET
+            image_link = 'https://images.unsplash.com/photo-1519995451813-39e29e054914?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+            video_link = 'https://www.youtube.com/watch?v=SSo_EIwHSd4'
+            WHERE
+            id = 'TGS-2020507496'`,
+            (errors, results) => {
+                    if (errors) throw errors;
+                }
+        );
+    }
+    console.log(`Inserted course ${obj.data.courses[0].referenceNumber}: ${obj.data.courses[0].title}`);
+
+    const seed_data = [
+    {
+      id:'TGS-2020507493',
+      img: "https://images.unsplash.com/photo-1559526324-593bc073d938?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80", 
+      title: "Investment 101",
+      earnings: 10
+    },
+    {
+        id:'TGS-2020507494',
+      img: 'https://images.unsplash.com/photo-1604594849809-dfedbc827105?11ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8aW52ZXN0bWVudHxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60', 
+      title: "Finance 101",
+      earnings: 20
+    },
+    {
+        id:'TGS-2020507495',
+      img: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80', 
+      title: "Econometrics",
+      earnings: 30
+    }];
+
+    for(let i = 0; i< seed_data.length;i++)
+    {
+        connection.query(
+            `INSERT INTO
+            course (id,title,earnings,image_link)
+            VALUES ('${seed_data[i].id}','${seed_data[i].title}','${seed_data[i].earnings}','${seed_data[i].img}')
+            `,
+            (errors, results) => {
+                    if (errors) throw errors;
+                }
+        );
+        console.log(`Inserted course ${seed_data[i].id}: ${seed_data[i].title}`);
+    }
+
+
+
     });
 
+// Uncomment this part to delete and create user and transaction tables
+/*
     connection.query(`DROP TABLE user`, 
         (errors, results) => {
             if (errors) throw errors;
@@ -168,8 +186,10 @@ connection.connect((errors) => {
         }
     );
     console.log("Created table transaction");
-  }
+*/
+    }
 });
+
 
 // Export the connection object so that it could be used in other code files.
 module.exports = {
