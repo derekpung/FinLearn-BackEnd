@@ -1,11 +1,10 @@
-
-
-
-
+const express = require("express");
+const server = require("./server");
+let router = express.Router();
 
 // Get all courses at explore page
-app.get('/course/all', (req, res) => {
-  db.query("SELECT * FROM course;", (err,result)=>{
+router.get('/course/all', (req, res) => {
+  server.db.query("SELECT * FROM course;", (err,result)=>{
       if(err){
           console.log(err);
           res.status(500).send("get all courses error occurred");
@@ -17,8 +16,8 @@ app.get('/course/all', (req, res) => {
 });
 
 // Get course details by id
-app.get('/course/by-cid', (req, res) => {
-  db.query(`SELECT * FROM course where id = '${req.query.cid}'`, (err,result)=>{
+router.get('/course/by-cid', (req, res) => {
+  server.db.query(`SELECT * FROM course where id = '${req.query.cid}'`, (err,result)=>{
       if(err){
           console.log(err);
           res.status(500).send("cid error occurred");
@@ -30,8 +29,8 @@ app.get('/course/by-cid', (req, res) => {
 });
 
 // Get completed courses by user id
-app.get("/transaction/completed/by-uid", (req, res) => {
-  db.query(
+router.get("/transaction/completed/by-uid", (req, res) => {
+  server.db.query(
     `select course 
     from transaction 
     where user = '${req.query.uid}' AND completed != '0000-00-00 00:00:00'`,
@@ -45,3 +44,6 @@ app.get("/transaction/completed/by-uid", (req, res) => {
     }
   );
 });
+
+
+module.exports = { router };
