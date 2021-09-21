@@ -31,10 +31,10 @@ app.get('/course/all', (req, res) => {
     });
 });
 
-// Get user by specific id at profile page
+// Get user details by specific id at profile page
 app.get("/user/by-uid", (req, res) => {
   db.query(
-    `select id from user where id = '${req.query.uid}'`,
+    `select * from user where id = '${req.query.uid}'`,
     (errors, results) => {
       if (errors) {
         console.log(errors);
