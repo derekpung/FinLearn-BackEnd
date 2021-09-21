@@ -99,9 +99,24 @@ app.post("/transaction/add/by-uid-cid", (req, res) => {
 });
 
 // Get transaction completion status by user id and course id
-app.get("/transaction/by-uid-cid", (req, res) => {
+app.get("/transaction/status/by-uid-cid", (req, res) => {
   db.query(
     `select completed from transaction where user = '${req.query.uid}' and course = '${req.query.cid}'`,
+    (errors, results) => {
+      if (errors) {
+        console.log(errors);
+        res.status(500).send("Error occurred for get transaction completion");
+      } else {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
+// Get all transactions by user id
+app.get("/transaction/all/by-uid", (req, res) => {
+  db.query(
+    `select * from transaction where user = '${req.query.uid}'`,
     (errors, results) => {
       if (errors) {
         console.log(errors);
