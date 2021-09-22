@@ -1,11 +1,10 @@
-
-
-
-
+const server = require("./server");
+const express = require("express");
+let router = express.Router();
 
 // Get user details by specific id at profile page
-app.get("/user/by-uid", (req, res) => {
-  db.query(
+router.get("/user/by-uid", (req, res) => {
+  server.db.query(
     `select * from user where id = '${req.query.uid}'`,
     (errors, results) => {
       if (errors) {
@@ -19,7 +18,7 @@ app.get("/user/by-uid", (req, res) => {
 });
 
 // Add new user at profile page
-app.post("/user/add", (req, res) => {
+router.post("/user/add", (req, res) => {
     const id= req.body.id;
     const name= req.body.name;
     const email= req.body.email;
@@ -30,7 +29,7 @@ app.post("/user/add", (req, res) => {
     const sqlInsert = 
         "insert into user (id,name,email,signup,verified,wallet) values (?,?,?,?,?,'0')";
   
-    db.query(sqlInsert, [id,name,email,signup_timestamp,verified],
+    sever.db.query(sqlInsert, [id,name,email,signup_timestamp,verified],
         (errors, results) => {
             if (errors) {
                 console.log(errors);
@@ -43,7 +42,7 @@ app.post("/user/add", (req, res) => {
 });
 
 // Add earnings to user's wallet by user id and course id after completing quiz
-app.put("/user/wallet/update/by-uid-cid", (req, res) => {
+router.put("/user/wallet/update/by-uid-cid", (req, res) => {
   const sqlUpdate = 
       `update user as u
       inner join transaction as t ON u.id = t.user
@@ -51,7 +50,7 @@ app.put("/user/wallet/update/by-uid-cid", (req, res) => {
       set u.wallet = u.wallet + c.earnings
       where u.id = '${req.query.uid}' and c.id = '${req.query.cid}'`;
 
-  db.query(sqlUpdate,
+  server.db.query(sqlUpdate,
       (errors, results) => {
           if (errors) {
               console.log(errors);
@@ -62,3 +61,5 @@ app.put("/user/wallet/update/by-uid-cid", (req, res) => {
       }
   );
 });
+
+module.exports = { router };

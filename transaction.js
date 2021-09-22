@@ -1,15 +1,13 @@
-
-
-
-
-
+const server = require("./server");
+const express = require("express");
+let router = express.Router();
 
 // Add transaction after user register for the course
-app.post("/transaction/add/by-uid-cid", (req, res) => {
+router.post("/transaction/add/by-uid-cid", (req, res) => {
   const sqlInsert = 
       `insert into transaction (signup,user,course) values (now(),'${req.query.uid}','${req.query.cid}')`;
 
-  db.query(sqlInsert,
+  server.db.query(sqlInsert,
       (errors, results) => {
           if (errors) {
               console.log(errors);
@@ -22,8 +20,8 @@ app.post("/transaction/add/by-uid-cid", (req, res) => {
 });
 
 // Get transaction completion status by user id and course id
-app.get("/transaction/status/by-uid-cid", (req, res) => {
-db.query(
+router.get("/transaction/status/by-uid-cid", (req, res) => {
+server.db.query(
   `select completed from transaction where user = '${req.query.uid}' and course = '${req.query.cid}'`,
   (errors, results) => {
     if (errors) {
@@ -37,8 +35,8 @@ db.query(
 });
 
 // Get all transactions by user id
-app.get("/transaction/all/by-uid", (req, res) => {
-db.query(
+router.get("/transaction/all/by-uid", (req, res) => {
+server.db.query(
   `select * from transaction where user = '${req.query.uid}'`,
   (errors, results) => {
     if (errors) {
@@ -53,11 +51,11 @@ db.query(
 
 
 // Update transaction completion timestamp by user id and course id after completing quiz
-app.put("/transaction/update/by-uid-cid", (req, res) => {
+router.put("/transaction/update/by-uid-cid", (req, res) => {
   const sqlUpdate = 
       `update transaction set completed = now() where user = '${req.query.uid}' and course = '${req.query.cid}'`;
 
-  db.query(sqlUpdate,
+  server.db.query(sqlUpdate,
       (errors, results) => {
           if (errors) {
               console.log(errors);
@@ -68,3 +66,6 @@ app.put("/transaction/update/by-uid-cid", (req, res) => {
       }
   );
 });
+
+
+module.exports = { router };
