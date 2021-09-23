@@ -22,7 +22,7 @@ router.post("/transaction/add/by-uid-cid", (req, res) => {
 // Get completed transactions
 router.get("/transaction/status/by-user-complete", (req, res) => {
   server.db.query(
-    `select completed from transaction where user = '${req.query.uid}' and completed != "0000-00-00 00:00:00"`,
+    `select * from transaction where user = '${req.query.uid}' and completed != "0000-00-00 00:00:00"`,
     (errors, results) => {
       if (errors) {
         console.log(errors);
@@ -37,7 +37,7 @@ router.get("/transaction/status/by-user-complete", (req, res) => {
 // Get incomplete transactions
 router.get("/transaction/status/by-user-incomplete", (req, res) => {
   server.db.query(
-    `select completed from transaction where user = '${req.query.uid}' and completed = "0000-00-00 00:00:00"`,
+    `select * from transaction where user = '${req.query.uid}' and completed = "0000-00-00 00:00:00"`,
     (errors, results) => {
       if (errors) {
         console.log(errors);
@@ -69,7 +69,7 @@ server.db.query(
 // Update transaction completion timestamp by user id and course id after completing quiz
 router.put("/transaction/update/by-uid-cid", (req, res) => {
   const sqlUpdate = 
-      `update transaction set completed = now() where user = '${req.query.uid}' and course = '${req.query.cid}'`;
+      `update transaction set completed = now() where user = '${req.body.params.uid}' and course = '${req.body.params.cid}'`;
 
   server.db.query(sqlUpdate,
       (errors, results) => {

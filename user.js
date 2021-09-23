@@ -48,7 +48,7 @@ router.put("/user/wallet/update/by-uid-cid", (req, res) => {
       inner join transaction as t ON u.id = t.user
       inner join course as c ON t.course = c.id
       set u.wallet = u.wallet + c.earnings
-      where u.id = '${req.query.uid}' and c.id = '${req.query.cid}'`;
+      where u.id = '${req.body.params.uid}' and c.id = '${req.body.params.cid}'`;
 
   server.db.query(sqlUpdate,
       (errors, results) => {
