@@ -5,7 +5,7 @@ let router = express.Router();
 // Add transaction after user register for the course
 router.post("/transaction/add/by-uid-cid", (req, res) => {
   const sqlInsert = 
-      `insert into transaction (signup,user,course) values (now(),'${req.query.uid}','${req.query.cid}')`;
+      `insert into transaction (signup,user,course) values (now(),'${req.body.params.uid}','${req.body.params.cid}')`;
 
   server.db.query(sqlInsert,
       (errors, results) => {
