@@ -29,7 +29,7 @@ router.post("/user/add", (req, res) => {
     const sqlInsert = 
         "insert into user (id,name,email,signup,verified,wallet) values (?,?,?,?,?,'0')";
   
-    sever.db.query(sqlInsert, [id,name,email,signup_timestamp,verified],
+    server.db.query(sqlInsert, [id,name,email,signup_timestamp,verified],
         (errors, results) => {
             if (errors) {
                 console.log(errors);
