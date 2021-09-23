@@ -19,20 +19,36 @@ router.post("/transaction/add/by-uid-cid", (req, res) => {
   );
 });
 
-// Get transaction completion status by user id and course id
-router.get("/transaction/status/by-uid-cid", (req, res) => {
-server.db.query(
-  `select completed from transaction where user = '${req.query.uid}' and course = '${req.query.cid}'`,
-  (errors, results) => {
-    if (errors) {
-      console.log(errors);
-      res.status(500).send("Error occurred for get transaction completion");
-    } else {
-      res.status(200).send(results);
+// Get completed transactions
+router.get("/transaction/status/by-user-complete", (req, res) => {
+  server.db.query(
+    `select completed from transaction where user = '${req.query.uid}' and completed != "0000-00-00 00:00:00"`,
+    (errors, results) => {
+      if (errors) {
+        console.log(errors);
+        res.status(500).send("Error occurred for get transaction completion");
+      } else {
+        res.status(200).send(results);
+      }
     }
-  }
-);
+  );
 });
+
+// Get incomplete transactions
+router.get("/transaction/status/by-user-incomplete", (req, res) => {
+  server.db.query(
+    `select completed from transaction where user = '${req.query.uid}' and completed = "0000-00-00 00:00:00"`,
+    (errors, results) => {
+      if (errors) {
+        console.log(errors);
+        res.status(500).send("Error occurred for get transaction completion");
+      } else {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 
 // Get all transactions by user id
 router.get("/transaction/all/by-uid", (req, res) => {
