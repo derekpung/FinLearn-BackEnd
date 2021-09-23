@@ -136,12 +136,12 @@ connection.connect((errors) => {
         console.log(`Inserted course ${seed_data[i].id}: ${seed_data[i].title}`);
     }
 
-
+    console.log("Database seeding completed");
 
     });
 
-// Uncomment this part to delete and create user and transaction tables
-/*
+// The following code deletes and re-creates the user and transaction tables
+
     connection.query(`DROP TABLE user`, 
         (errors, results) => {
             if (errors) throw errors;
@@ -186,7 +186,7 @@ connection.connect((errors) => {
         }
     );
     console.log("Created table transaction");
-*/
+
     }
 });
 
