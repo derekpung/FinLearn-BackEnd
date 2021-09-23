@@ -22,7 +22,7 @@ router.post("/transaction/add/by-uid-cid", (req, res) => {
 // Get completed transactions
 router.get("/transaction/status/by-user-complete", (req, res) => {
   server.db.query(
-    `select * from transaction where user = '${req.query.uid}' and completed != "0000-00-00 00:00:00"`,
+    `select * from transaction as t inner join course as c ON t.course = c.id where t.user = '${req.query.uid}' and t.completed != "0000-00-00 00:00:00"`,
     (errors, results) => {
       if (errors) {
         console.log(errors);
