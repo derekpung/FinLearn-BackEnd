@@ -1,0 +1,8 @@
+# MySQL database environment variables
+REACT_APP_DBHOST=YourMySQLServerURLhere
+REACT_APP_DBUSER=YourUsernameHere
+REACT_APP_DBPASSWD=YourPasswordHere
+REACT_APP_DBPORT=YourPortNumberHere
+REACT_APP_DBNAME=YourDatabaseNameHere
+# Skillsfuture token
+SFTOKEN=Bearer YourTokenHere
